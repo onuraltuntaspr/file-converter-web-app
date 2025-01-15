@@ -3,8 +3,8 @@ import { ReactNode } from 'react'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
+  title: 'File Converter Web App',
+  description: 'Convert your files to different formats easily',
 }
 
 export default function RootLayout({
