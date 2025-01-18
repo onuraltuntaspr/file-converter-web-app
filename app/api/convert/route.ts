@@ -24,26 +24,19 @@ async function convertCsvToJson(buffer: Buffer) {
 
 async function convertToJsonl(buffer: Buffer, originalFilename: string) {
   const fileType = await fileTypeFromBuffer(buffer)
+  console.log('Tespit edilen dosya tipi:', fileType?.ext)
 
   let data
-  switch (fileType?.ext) {
-    case 'xlsx':
-    case 'xls':
-      data = await convertExcelToJson(buffer)
-      break
-    case 'docx':
-    case 'doc':
-      data = await convertWordToText(buffer)
-      break
-    case 'csv':
-      data = await convertCsvToJson(buffer)
-      break
-    default:
-      if (originalFilename.endsWith('.txt')) {
-        data = buffer.toString('utf-8')
-      } else {
-        throw new Error('Desteklenmeyen dosya formatı')
-      }
+  if (originalFilename.toLowerCase().endsWith('.xlsx') || originalFilename.toLowerCase().endsWith('.xls')) {
+    data = await convertExcelToJson(buffer)
+  } else if (originalFilename.toLowerCase().endsWith('.docx') || originalFilename.toLowerCase().endsWith('.doc')) {
+    data = await convertWordToText(buffer)
+  } else if (originalFilename.toLowerCase().endsWith('.csv')) {
+    data = await convertCsvToJson(buffer)
+  } else if (originalFilename.toLowerCase().endsWith('.txt')) {
+    data = buffer.toString('utf-8')
+  } else {
+    throw new Error(`Desteklenmeyen dosya formatı. Dosya adı: ${originalFilename}, Tespit edilen format: ${fileType?.ext}`)
   }
 
   let jsonlData
@@ -74,8 +67,15 @@ export async function POST(req: NextRequest) {
     }
 
     const allowedTypes = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/csv', 'text/plain']
+    console.log('Dosya tipi:', file.type);
+    console.log('Dosya adı:', file.name);
+    console.log('Dosya boyutu:', file.size);
+
     if (!allowedTypes.includes(file.type) && !file.name.endsWith('.pdf')) {
-      return NextResponse.json({ success: false, error: 'Desteklenmeyen dosya türü' }, { status: 400 })
+      return NextResponse.json({ 
+        success: false, 
+        error: `Desteklenmeyen dosya türü. Dosya tipi: ${file.type}, Desteklenen tipler: ${allowedTypes.join(', ')}` 
+      }, { status: 400 })
     }
 
     if (file.name.endsWith('.pdf')) {
@@ -105,4 +105,3 @@ export async function POST(req: NextRequest) {
     }, { status: 500 })
   }
 }
-

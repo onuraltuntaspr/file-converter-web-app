@@ -10,7 +10,7 @@ const FilePreview: React.FC<FilePreviewProps> = ({ content }) => {
 
   return (
     <div className="bg-gray-100 p-4 rounded-lg overflow-auto max-h-60">
-      <h3 className="text-lg font-semibold mb-2">Dosya Önizleme</h3>
+      <h3 className="text-xl font-bold mb-2 text-center text-blue-600">Önizleme (İlk 10 Satır)</h3>
       <pre className="text-sm">
         {previewLines.join('\n')}
         {lines.length > 10 && '\n...'}
@@ -20,4 +20,3 @@ const FilePreview: React.FC<FilePreviewProps> = ({ content }) => {
 }
 
 export default FilePreview
-
